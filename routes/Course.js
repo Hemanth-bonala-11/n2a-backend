@@ -24,7 +24,7 @@ const ratingController = require("../controllers/ratingAndReview")
 
 const { auth, isInstructor, isStudent, isAdmin } = require("../middlewares/auth")
 
-router.post("/createCourse", auth, isInstructor, courseController.createCourse)
+router.post("/createCourse", auth, courseController.createCourse)
 router.post("/addSection", auth, isInstructor, sectionController.createSection)
 router.post("/updateSection", auth, isInstructor, sectionController.updateSection)
 router.post("/deleteSection", auth, isInstructor, sectionController.deleteSection)
@@ -35,10 +35,12 @@ router.post("/addSubSection", auth, isInstructor, subsectionController.createSub
 
 // router.get("/getAllCourses", getAllCourses)
 router.post("/getCourseDetails", courseController.getCourseDetails)
+router.get("/getAllCourses", courseController.getAllCourses)
 // router.post("/getFullCourseDetails", auth, getFullCourseDetails)
 // router.post("/editCourse", auth, isInstructor, courseController.editCourse)
+router.post("/getEnrolledCourses", auth, isStudent, courseController.getEnrolledCourses)
 
-// router.get("/getInstructorCourses", auth, isInstructor, getInstructorCourses)
+router.post("/getInstructorCourses", auth, isInstructor, courseController.getAllInstructorCourses)
 // router.delete("/deleteCourse", deleteCourse)
 // router.post("/updateCourseProgress", auth, isStudent, updateCourseProgress);
 

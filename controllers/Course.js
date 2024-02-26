@@ -8,11 +8,14 @@ require('dotenv').config()
 // create course
 exports.createCourse = async (req, res)=>{
     try {
+        console.log(req);
         const {courseName, courseDescription, whatYouWillLearn, price, category} = req.body;
+        
 
         const thumbnail = req.files.thumbnail;
+        
 
-        if(!courseName || !courseDescription || !whatYouWillLearn || !price || !category || !thumbnail){
+        if(!courseName || !courseDescription || !whatYouWillLearn || !price  || !thumbnail){
             return res.status(400).json({
                 success: false,
                 message: "All fields are mandatory"
@@ -26,7 +29,7 @@ exports.createCourse = async (req, res)=>{
                 message: "Instructor details not found"
             })
         }
-
+        
         // const categoryDetails = await Category.findOne({name: category});
         const categoryDetails = await Category.findById(category)
         if(!categoryDetails){
@@ -42,12 +45,13 @@ exports.createCourse = async (req, res)=>{
         // check instructordetails._id and userid are same, if same remove calling instructordetails
         const newCourse = await Course.create({
             courseName,
-            courseDescription,
+            description:courseDescription,
             instructor: instructorDetails._id,
             whatYouWillLearn: whatYouWillLearn,
             price,
             category: category,
-            thumbnail: thumbnailImage.secure_url
+            thumbnail: thumbnailImage.secure_url,
+            status:"DRAFT"
         })
 
         // update course in instuctor's courses
@@ -143,4 +147,69 @@ exports.getCourseDetails = async (req, res)=>{
             message: error.message
         })  
     }
+}
+
+
+exports.getAllInstructorCourses = async (req, res)=>{
+    try {
+        const courses = await Course.find({instructor: req.user.id})
+        if(courses){
+            return res.status(200).json({
+                "Success": true,
+                "courses": courses
+            })
+        }
+        return res.status(200).json({
+            "success": true,
+            "message": "Courses not found"
+        })
+
+        
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+exports.getEnrolledCourses = async (req, res)=>{
+    try {
+       const user = await User.findById(req.user.id).populate("courses");
+
+       if(user){
+        return res.status(200).json({
+            "courses": user.courses,
+            "success": true
+        })
+       }
+       return res.status(404).json({
+        "success": false,
+        "message": "user not found"
+       })
+
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+exports.getAllCourses = async (req, res)=>{
+    try {
+        const courses = await Course.find({})
+        return res.status(200).json({
+            "success": true,
+            "courses": courses
+        })
+        
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: error.message
+        })
+        
+    }
+
 }

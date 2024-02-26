@@ -28,6 +28,7 @@ app.use(cookieParser());
 //     origin: "http://localhost:3000",
 //     credentials: true
 // }))
+app.use(cors())
 
 app.use(fileUpload({
     useTempFiles: true,
@@ -35,9 +36,9 @@ app.use(fileUpload({
 }))
 
 app.use("/api/v1/user", userRoutes);
-app.use("api/v1/profile", profileRoutes);
-app.use("api/v1/payment", paymentRoutes);
-app.use("api/v1/course", courseRoutes);
+app.use("/api/v1/profile", profileRoutes);
+app.use("/api/v1/payment", paymentRoutes);
+app.use("/api/v1/course", courseRoutes);
 
 app.listen(port, ()=>{
     console.log("server is running at port ", port)

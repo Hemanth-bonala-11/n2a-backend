@@ -50,24 +50,102 @@ exports.sendOTP = async (req,res)=>{
     }
 
 }
+exports.forgotPasswordOtp = async (req, res)=>{
+    try{
+        const {email} = req.body;
+
+    // if user already exists
+    const checkUserPresent = await User.findOne({email: email});
+    if(!checkUserPresent){
+        return res.status(404).json({success:false,
+        message:" user not  registered"})
+    }
+    let otp = otpGenerator.generate(6,{
+        upperCaseAlphabets: false,
+        specialChars: false,
+        lowerCaseAlphabets: false
+    })
+    // check unique otp
+    let result = await OTP.findOne({otp: otp});
+
+    while(result){
+        otp = otpGenerator.generate(6,{
+            upperCaseAlphabets: false,
+            specialChars: false,
+            lowerCaseAlphabets: false
+        });
+
+        result = await OTP.findOne({otp: otp});
+    }
+    const otpPayload = {email,otp}
+    const otpBody = await OTP.create(otpPayload)
+    
+
+    return res.status(200).json({
+        success: true,
+        message: "Otp sent Successfully"
+    })
+
+    }catch(err){
+        return res.status(400).json({
+            success: false,
+            message: err.message
+        })
+    }
+    
+}
 
 
 
 // changepassword
 exports.changePassword = async (req, res)=>{
     try{
-        const {email, oldPassword, newPassword} = req.body;
-        /*
-        get data from req.body,
-        get oldpass, new pass,
-        validate,
-        update pwd in db,
-        send email - updated password,
-        return response
-        */
+        const {email, oldPassword, newPassword, otp} = req.body;
+        
+        if(otp){
+        const recentOtp = await OTP.find({email:email}).sort({createdAt:-1}).limit(1);
+        const otps = await OTP.find({email: email});
+        console.log(otps);
+        if(recentOtp.length===0){
+            return res.status(400).json({
+                success: false,
+                message: "Otp not found"
+            })
+        }
+        
+        else if(recentOtp[0].otp !== otp){
+            return res.status(400).json({
+                success: false,
+                message: "Invalid otp entered"
+            })
+        }
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const user = await User.findOneAndUpdate({email:email}, {password: hashedPassword});
+        return res.status(200).json({"success": true, "user": user})
+        
+        }
+        else{
+
+            if(oldPassword === newPassword){
+                const hashedPassword = await bcrypt.hash(newPassword, 10);
+                const user = await User.findOneAndUpdate({email:email}, {password: hashedPassword});
+                return res.status(200).json({"success": true, "user": user})
+
+            }
+            else{
+                return res.status(400).json({
+                    "success": false, "message": "new password and old password should be same"
+                })
+            }
+
+        }
+        
 
     }catch(err){
-
+        return res.status(400).json({
+            success: false,
+            message: err.message
+        })
     }
 }
 
@@ -82,7 +160,6 @@ exports.signup = async (req, res)=>{
             lastName,
             email,
             password,
-            accountType,
             contactNumber,
             otp
         } = req.body;
@@ -95,6 +172,12 @@ exports.signup = async (req, res)=>{
                 message: "User is already registered"
             })
         }
+        if(email.split("@")[1] ==="nitj.ac.in"){
+            accountType="Instructor"
+        }
+        else{
+            accountType="Student"
+        }
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await User.create({
             firstName: firstName,
@@ -103,6 +186,7 @@ exports.signup = async (req, res)=>{
             password: hashedPassword,
             accountType: accountType,
         })
+        console.log("user", user)
         const recentOtp = await OTP.find({email: email}).sort({createdAt:-1}).limit(1);
         console.log(otp, typeof(otp));
         console.log(recentOtp[0].otp, typeof(recentOtp))
@@ -200,6 +284,26 @@ exports.login = async (req, res)=>{
         return res.status(400).json({
             success: false,
             message: err.message
+        })
+    }
+}
+
+exports.fetchUSerDetails = async (req, res)=>{
+    try {
+        const {access_token} = req.body
+        const decoded = await jwt.verify(access_token, process.env.SECRET_KEY);
+        email = decoded.email
+        console.log("hi");
+        const user = await User.findOne({email: email}).populate('additionalDetails')
+        console.log(user);
+
+         return res.status(200).json({"user_details": user})
+
+       
+        
+    } catch (error) {
+        return res.status(400).json({
+            "message": error.message, "success": false
         })
     }
 }

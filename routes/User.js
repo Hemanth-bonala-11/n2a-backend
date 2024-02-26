@@ -8,13 +8,7 @@ const reset = require("../controllers/ResetPassword")
 
 const { auth } = require("../middlewares/auth")
 
-// Routes for Login, Signup, and Authentication
 
-// ********************************************************************************************************
-//                                      Authentication routes
-// ********************************************************************************************************
-
-// Route for user login
 router.post("/login", authController.login)
 
 
@@ -22,11 +16,12 @@ router.post("/signup", authController.signup)
 
 
 router.post("/sendotp", authController.sendOTP)
-router.post("/changepassword", auth, authController.changePassword)
+router.post("/changepassword", authController.changePassword)
+router.post('/user-details', auth, authController.fetchUSerDetails)
 router.post("/reset-password-token", reset.resetPasswordToken)
 
-
 router.post("/reset-password", reset.resetPassword)
+router.post('/forgot-password', authController.forgotPasswordOtp)
 
 
 module.exports = router

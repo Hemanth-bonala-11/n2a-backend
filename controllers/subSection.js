@@ -19,7 +19,7 @@ exports.createSubSection = async (req, res)=>{
             title: title,
             description: description,
             timeDuration: duration,
-            videoUrl: videoFile
+            videoUrl: uploadedFileDetails.secure_url
         });
 
     const sectionUpdatedDetials = await Section.findByIdAndUpdate(sectionId,{
