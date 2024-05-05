@@ -8,6 +8,9 @@ const categorySchema = new mongoose.Schema({
     description: {
         type: String
     },
+    showOnHome:{
+        type: Boolean
+    },
     course:[
         {
             type: mongoose.Schema.Types.ObjectId,

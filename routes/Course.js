@@ -39,11 +39,13 @@ router.get("/getAllCourses", courseController.getAllCourses)
 // router.post("/getFullCourseDetails", auth, getFullCourseDetails)
 // router.post("/editCourse", auth, isInstructor, courseController.editCourse)
 router.post("/getEnrolledCourses", auth, isStudent, courseController.getEnrolledCourses)
-
+router.get('/homePage/courses',courseController.getHomePageCourses)
+router.get('/homePage/categories',courseController.getHomeCategories)
 router.post("/getInstructorCourses", auth, isInstructor, courseController.getAllInstructorCourses)
+router.post("/enrollCourse",auth,  courseController.enrollCourse)
 // router.delete("/deleteCourse", deleteCourse)
 // router.post("/updateCourseProgress", auth, isStudent, updateCourseProgress);
-
+router.post("/course_content",  courseController.fetchCourseContent);
 
 router.post("/createCategory", auth, isAdmin, categoryController.createCategory)
 router.get("/showAllCategories", categoryController.showAllCategories)
@@ -52,5 +54,6 @@ router.post("/getCategoryPageDetails", categoryController.categoryPageDetails)
 router.post("/createRating", auth, isStudent, ratingController.createRating)
 router.get("/getAverageRating", ratingController.getAverageRating)
 router.get("/getReviews", ratingController.getAllRatings)
+
 
 module.exports = router

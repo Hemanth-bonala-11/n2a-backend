@@ -23,5 +23,4 @@ router.post("/reset-password-token", reset.resetPasswordToken)
 router.post("/reset-password", reset.resetPassword)
 router.post('/forgot-password', authController.forgotPasswordOtp)
 
-
 module.exports = router

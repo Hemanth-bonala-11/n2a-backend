@@ -213,3 +213,113 @@ exports.getAllCourses = async (req, res)=>{
     }
 
 }
+
+exports.getHomePageCourses = async(req, res)=>{
+    try {
+        let categories = await Category.find({showOnHome: true}).populate(
+            {
+                path: "course",
+                select:"courseName description price ratingsAndReviews thumbnail"
+            }
+            
+        ).exec();
+        
+
+        return res.status(200).json({
+            "categories": categories,
+            "success": true
+        })
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: error.message
+        })
+    }
+    
+}
+
+exports.getHomeCategories = async(req, res)=>{
+    try {
+        let categories = await Category.find({});
+
+        return res.status(200).json({
+            "categories": categories,
+            "success": true
+        })
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+exports.enrollCourse =async (req, res)=>{
+    try {
+       
+        const {courseId} = req.body;
+        console.log(courseId, req.user,"course id");
+        
+        
+        const courses = await User.findByIdAndUpdate(req.user.id,
+            {
+                $push:{
+                    courses: courseId
+                }
+            },
+            {new: true})
+
+           
+            const course = await Course.findByIdAndUpdate(courseId, {
+                $push:{
+                    studentsEnrolled: req.user.id
+                }
+            },
+            {new: true})
+            return res.status(200).json({
+                "success" : true,
+            }
+            )
+
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+exports.fetchCourseContent = async (req, res)=>{
+    try {
+        const {courseId} = req.body;
+        const user = await User.findById(req.user._id);
+
+        if(user.courses.includes(courseId)){
+            const course = await Course.findById(courseId).populate(
+                {
+                    path: "courseContent",
+                    populate:{
+                        path: "subSections"
+                    }
+                }
+            )
+    
+            return res.status(200).json({
+                "course": course,
+                "success": true
+            })
+        }
+        else{
+            return res.status(400).json({
+                success:false,
+                message: "Not authorized to access this course content"
+            })
+        }
+        
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: error.message
+        }) 
+    }
+}

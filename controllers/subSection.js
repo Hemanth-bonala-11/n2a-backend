@@ -28,7 +28,7 @@ exports.createSubSection = async (req, res)=>{
         }
     },
       {new: true} );
-      // todo: populate all sectiondetails with subsection details
+      // todo after buy course (accessing course content): populate all sectiondetails with subsection details
 
     return res.status(200).json({
         success: true,

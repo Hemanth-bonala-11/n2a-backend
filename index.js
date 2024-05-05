@@ -5,6 +5,7 @@ const userRoutes = require('./routes/User')
 const paymentRoutes = require('./routes/Payment')
 const courseRoutes = require('./routes/Course')
 const profileRoutes = require('./routes/Profile')
+const adminRoutes = require('./routes/Admin')
 
 const database = require('./config/database')
 const cloudinary = require('./config/cloudinary');
@@ -39,6 +40,7 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/profile", profileRoutes);
 app.use("/api/v1/payment", paymentRoutes);
 app.use("/api/v1/course", courseRoutes);
+app.use("/api/v1/admin", adminRoutes);
 
 app.listen(port, ()=>{
     console.log("server is running at port ", port)
