@@ -175,7 +175,14 @@ exports.getAllInstructorCourses = async (req, res)=>{
 
 exports.getEnrolledCourses = async (req, res)=>{
     try {
-       const user = await User.findById(req.user.id).populate("courses");
+       const user = await User.findById(req.user.id).populate({
+        path: "courses",
+        populate:{
+            path: "instructor",
+            select: "firstName"
+        }
+    }
+       ).exec();
 
        if(user){
         return res.status(200).json({
@@ -292,7 +299,7 @@ exports.enrollCourse =async (req, res)=>{
 exports.fetchCourseContent = async (req, res)=>{
     try {
         const {courseId} = req.body;
-        const user = await User.findById(req.user._id);
+        const user = await User.findById(req.user.id);
 
         if(user.courses.includes(courseId)){
             const course = await Course.findById(courseId).populate(
@@ -302,7 +309,7 @@ exports.fetchCourseContent = async (req, res)=>{
                         path: "subSections"
                     }
                 }
-            )
+            ).exec()
     
             return res.status(200).json({
                 "course": course,

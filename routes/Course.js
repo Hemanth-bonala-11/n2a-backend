@@ -45,7 +45,7 @@ router.post("/getInstructorCourses", auth, isInstructor, courseController.getAll
 router.post("/enrollCourse",auth,  courseController.enrollCourse)
 // router.delete("/deleteCourse", deleteCourse)
 // router.post("/updateCourseProgress", auth, isStudent, updateCourseProgress);
-router.post("/course_content",  courseController.fetchCourseContent);
+router.post("/course_content", auth,  courseController.fetchCourseContent);
 
 router.post("/createCategory", auth, isAdmin, categoryController.createCategory)
 router.get("/showAllCategories", categoryController.showAllCategories)
